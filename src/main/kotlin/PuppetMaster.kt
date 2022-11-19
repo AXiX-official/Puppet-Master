@@ -1,14 +1,12 @@
-package org.example.mirai.plugin
+package org.axix.mirai.plugin.puppetmaster
 
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescription
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
-import net.mamoe.mirai.event.EventChannel
 import net.mamoe.mirai.event.GlobalEventChannel
 import net.mamoe.mirai.event.events.BotInvitedJoinGroupRequestEvent
 import net.mamoe.mirai.event.events.FriendMessageEvent
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.NewFriendRequestEvent
-import net.mamoe.mirai.event.globalEventChannel
 import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
 import net.mamoe.mirai.message.data.PlainText
@@ -29,13 +27,13 @@ import net.mamoe.mirai.utils.info
  * 不用复制到 mirai-console-loader 或其他启动器中调试
  */
 
-object PluginMain : KotlinPlugin(
+object PuppetMaster : KotlinPlugin(
     JvmPluginDescription(
-        id = "org.example.mirai-example",
-        name = "插件示例",
+        id = "org.axix.mirai.plugin.puppetmaster",
+        name = "木偶大师",
         version = "0.1.0"
     ) {
-        author("作者名称或联系方式")
+        author("轩晞宇-AXiX")
         info(
             """
             这是一个测试插件, 

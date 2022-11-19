@@ -1,4 +1,4 @@
-package org.example.mirai.plugin
+package org.axix.mirai.plugin.puppetmaster
 
 import net.mamoe.mirai.alsoLogin
 import net.mamoe.mirai.console.MiraiConsole
@@ -10,8 +10,8 @@ suspend fun main() {
     MiraiConsoleTerminalLoader.startAsDaemon()
 
     //如果是Kotlin
-    PluginMain.load()
-    PluginMain.enable()
+    PuppetMaster.load()
+    PuppetMaster.enable()
     //如果是Java
 //    JavaPluginMain.INSTANCE.load()
 //    JavaPluginMain.INSTANCE.enable()
