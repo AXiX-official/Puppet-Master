@@ -2,6 +2,7 @@ package org.axix.mirai.plugin.puppetmaster
 
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescription
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
+import net.mamoe.mirai.console.plugin.jvm.reloadPluginConfig
 import net.mamoe.mirai.event.GlobalEventChannel
 import net.mamoe.mirai.event.events.BotInvitedJoinGroupRequestEvent
 import net.mamoe.mirai.event.events.FriendMessageEvent
@@ -9,8 +10,11 @@ import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.NewFriendRequestEvent
 import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
+import net.mamoe.mirai.message.data.MessageChainBuilder
 import net.mamoe.mirai.message.data.PlainText
+import net.mamoe.mirai.message.data.content
 import net.mamoe.mirai.utils.info
+import javax.swing.GroupLayout.Group
 
 /**
  * 使用 kotlin 版请把
@@ -36,20 +40,27 @@ object PuppetMaster : KotlinPlugin(
         author("轩晞宇-AXiX")
         info(
             """
-            这是一个测试插件, 
-            在这里描述插件的功能和用法等.
+            这是一个实现了通过认证的QQ号码私聊控制机器人QQ活动的插件。
         """.trimIndent()
         )
         // author 和 info 可以删除.
     }
 ) {
+    private var flag:Int = 0
+    //private var targetGroup = Array()
+    private var p:Long = 0
     override fun onEnable() {
         logger.info { "Plugin loaded" }
         //配置文件目录 "${dataFolder.absolutePath}/"
+        reloadPluginConfig(Config)
+        //targetGroup = Config.whiteGroupList
+        //监听所有bot
         val eventChannel = GlobalEventChannel.parentScope(this)
+        //监听群消息
         eventChannel.subscribeAlways<GroupMessageEvent>{
             //群消息
             //复读示例
+            /*
             if (message.contentToString().startsWith("复读")) {
                 group.sendMessage(message.contentToString().replace("复读", ""))
             }
@@ -74,18 +85,54 @@ object PuppetMaster : KotlinPlugin(
                     group.sendMessage("纯文本，内容:${it.content}")
                 }
             }
+
+             */
         }
         eventChannel.subscribeAlways<FriendMessageEvent>{
-            //好友信息
-            sender.sendMessage("hi")
+            if(sender.id == Config.adminQQ){
+                when(flag){
+                    0 -> {
+                        if(message.content.contentEquals("/send")){
+                            flag = 1
+                            sender.sendMessage("请输入要发送的群号")
+                        }
+                    }
+                    1 -> {
+                        if(message.content.contentEquals("/")){
+                            flag = 0
+                            sender.sendMessage("已退出")
+                        }else{
+                            p = message.content.toLong()
+                            sender.sendMessage("$p 请输入要发送的内容")
+                            flag = 2
+                        }
+                    }
+                    2 -> {
+                        if(message.content.contentEquals("/")){
+                            flag = 0
+                            sender.sendMessage("已退出")
+                        }else{
+                            val mcb = MessageChainBuilder().append(message)
+                            val group = this.bot.getGroup(p)
+                            if(group is net.mamoe.mirai.contact.Group){
+                                group.sendMessage(mcb.asMessageChain())
+                                sender.sendMessage("已发送")
+                            }else{
+                                flag = 1
+                                sender.sendMessage("群号错误请重新发送")
+                            }
+                        }
+                    }
+                }
+            }
         }
         eventChannel.subscribeAlways<NewFriendRequestEvent>{
             //自动同意好友申请
-            accept()
+            //accept()
         }
         eventChannel.subscribeAlways<BotInvitedJoinGroupRequestEvent>{
             //自动同意加群申请
-            accept()
+            //accept()
         }
     }
 }
