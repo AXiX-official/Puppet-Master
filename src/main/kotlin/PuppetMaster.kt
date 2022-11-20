@@ -14,7 +14,6 @@ import net.mamoe.mirai.message.data.MessageChainBuilder
 import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.content
 import net.mamoe.mirai.utils.info
-import javax.swing.GroupLayout.Group
 
 /**
  * 使用 kotlin 版请把
