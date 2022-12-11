@@ -8,12 +8,23 @@ import net.mamoe.mirai.event.events.BotInvitedJoinGroupRequestEvent
 import net.mamoe.mirai.event.events.FriendMessageEvent
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.NewFriendRequestEvent
-import net.mamoe.mirai.message.data.Image
+import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
-import net.mamoe.mirai.message.data.MessageChainBuilder
-import net.mamoe.mirai.message.data.PlainText
-import net.mamoe.mirai.message.data.content
+import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import net.mamoe.mirai.utils.info
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import net.mamoe.mirai.console.extension.PluginComponentStorage
+import net.mamoe.mirai.event.selectMessages
+import kotlin.io.*
+import net.mamoe.mirai.utils.ExternalResource
+import java.net.URL
+import java.nio.channels.Channels
+import java.nio.channels.FileChannel
+import java.nio.file.Paths
+import java.nio.file.StandardOpenOption
+import java.io.File
+import kotlin.io.*
 
 /**
  * 使用 kotlin 版请把
@@ -45,13 +56,13 @@ object PuppetMaster : KotlinPlugin(
         // author 和 info 可以删除.
     }
 ) {
-    private var flag:Int = 0
-    //private var targetGroup = Array()
+    private var sendFlag:Int = 0
     private var p:Long = 0
+
     override fun onEnable() {
         logger.info { "Plugin loaded" }
         //配置文件目录 "${dataFolder.absolutePath}/"
-        reloadPluginConfig(Config)
+        Config.reload()
         //targetGroup = Config.whiteGroupList
         //监听所有bot
         val eventChannel = GlobalEventChannel.parentScope(this)
@@ -89,26 +100,26 @@ object PuppetMaster : KotlinPlugin(
         }
         eventChannel.subscribeAlways<FriendMessageEvent>{
             if(sender.id == Config.adminQQ){
-                when(flag){
+                when(sendFlag){
                     0 -> {
                         if(message.content.contentEquals("/send")){
-                            flag = 1
+                            sendFlag = 1
                             sender.sendMessage("请输入要发送的群号")
                         }
                     }
                     1 -> {
                         if(message.content.contentEquals("/")){
-                            flag = 0
+                            sendFlag = 0
                             sender.sendMessage("已退出")
                         }else{
                             p = message.content.toLong()
                             sender.sendMessage("$p 请输入要发送的内容")
-                            flag = 2
+                            sendFlag = 2
                         }
                     }
                     2 -> {
                         if(message.content.contentEquals("/")){
-                            flag = 0
+                            sendFlag = 0
                             sender.sendMessage("已退出")
                         }else{
                             val mcb = MessageChainBuilder().append(message)
@@ -117,7 +128,7 @@ object PuppetMaster : KotlinPlugin(
                                 group.sendMessage(mcb.asMessageChain())
                                 sender.sendMessage("已发送")
                             }else{
-                                flag = 1
+                                sendFlag = 1
                                 sender.sendMessage("群号错误请重新发送")
                             }
                         }

@@ -12,13 +12,8 @@ suspend fun main() {
     //如果是Kotlin
     PuppetMaster.load()
     PuppetMaster.enable()
-    //如果是Java
-//    JavaPluginMain.INSTANCE.load()
-//    JavaPluginMain.INSTANCE.enable()
 
-    val bot = MiraiConsole.addBot(3092539395, "1414144gudu") {
-        fileBasedDeviceInfo()
-    }.alsoLogin()
+
 
     MiraiConsole.job.join()
 }
